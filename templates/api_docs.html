@@ -1,0 +1,147 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2FA REST API Documentation</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f9fa; color: #222; margin: 0; padding: 0; }
+        .container { max-width: 900px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; padding: 32px; }
+        h1, h2, h3 { color: #2c3e50; }
+        h1 { border-bottom: 2px solid #eee; padding-bottom: 8px; }
+        pre, code { background: #f4f4f4; border-radius: 4px; padding: 8px; font-size: 15px; }
+        pre { overflow-x: auto; }
+        .endpoint { background: #eaf6ff; border-left: 4px solid #3498db; padding: 8px 16px; margin: 16px 0; }
+        .note { background: #fffbe6; border-left: 4px solid #f1c40f; padding: 8px 16px; margin: 16px 0; }
+        ul { margin-left: 24px; }
+        .success { color: #27ae60; }
+        .fail { color: #c0392b; }
+        .coffee-btn {
+            display: inline-block;
+            background: #ffdd00;
+            color: #222;
+            font-weight: bold;
+            padding: 12px 28px;
+            border-radius: 6px;
+            font-size: 18px;
+            text-decoration: none;
+            box-shadow: 0 2px 8px #0001;
+            margin-top: 32px;
+        }
+        @media (max-width: 600px) {
+            .container { max-width: 99vw; margin: 10vw 1vw; padding: 12px 2vw; }
+            h1 { font-size: 1.3em; }
+            h2, h3 { font-size: 1.1em; }
+            pre, code { font-size: 1em; }
+            .coffee-btn { font-size: 1.1em; padding: 12px 10vw; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>2FA REST API Documentation</h1>
+    <p>This API allows developers to integrate Two-Factor Authentication (2FA) into their own websites or applications using your service.</p>
+
+    <h2>Authentication</h2>
+    <ul>
+        <li><b>API Key</b>: Each user receives a unique API Key after registration/login, visible on their dashboard.</li>
+        <li><b>Usage</b>: For protected endpoints, include the API Key in the HTTP header:<br>
+            <code>X-API-KEY: &lt;your_api_key&gt;</code>
+        </li>
+    </ul>
+
+    <h2>Endpoints</h2>
+
+    <h3>1. Register User</h3>
+    <div class="endpoint"><b>POST</b> <code>/api/register</code></div>
+    <b>Request Body:</b>
+    <pre>{
+  "email": "user@example.com",
+  "password": "yourpassword"
+}</pre>
+    <b>Response:</b>
+    <pre>{
+  "success": true,
+  "message": "Registration successful!",
+  "user_id": 1
+}</pre>
+
+    <h3>2. Login User</h3>
+    <div class="endpoint"><b>POST</b> <code>/api/login</code></div>
+    <b>Request Body:</b>
+    <pre>{
+  "email": "user@example.com",
+  "password": "yourpassword"
+}</pre>
+    <b>Response:</b>
+    <pre>{
+  "success": true,
+  "message": "Login successful. Proceed to 2FA.",
+  "user_id": 1
+}</pre>
+
+    <h3>3. Initialize 2FA (Get QR Code &amp; Secret)</h3>
+    <div class="endpoint"><b>POST</b> <code>/api/2fa/init</code></div>
+    <b>Request Body:</b>
+    <pre>{
+  "user_id": 1
+}</pre>
+    <b>Response:</b>
+    <pre>{
+  "success": true,
+  "secret": "JBSWY3DPEHPK3PXP",
+  "qr_b64": "&lt;base64-encoded-png&gt;",
+  "otpauth_url": "otpauth://totp/Flask2FA:user@example.com?secret=JBSWY3DPEHPK3PXP&amp;issuer=Flask2FA"
+}</pre>
+    <ul>
+        <li><b>qr_b64</b>: Base64-encoded PNG image for Google Authenticator.</li>
+        <li><b>secret</b>: Manual entry for authenticator apps.</li>
+        <li><b>otpauth_url</b>: For direct integration with authenticator apps.</li>
+    </ul>
+
+    <h3>4. Verify OTP (2FA)</h3>
+    <div class="endpoint"><b>POST</b> <code>/api/2fa/verify</code></div>
+    <b>Headers:</b>
+    <pre>X-API-KEY: &lt;your_api_key&gt;
+Content-Type: application/json</pre>
+    <b>Request Body:</b>
+    <pre>{
+  "otp": "123456"
+}</pre>
+    <b>Response (Success):</b>
+    <pre class="success">{
+  "success": true,
+  "message": "2FA verification successful!"
+}</pre>
+    <b>Response (Failure):</b>
+    <pre class="fail">{
+  "success": false,
+  "message": "Invalid OTP."
+}</pre>
+
+    <h2>Example: Verify OTP with cURL</h2>
+    <pre>curl -X POST https://yourdomain.com/api/2fa/verify \
+  -H "Content-Type: application/json" \
+  -H "X-API-KEY: &lt;your_api_key&gt;" \
+  -d '{"otp": "123456"}'
+</pre>
+
+    <h2>Notes</h2>
+    <div class="note">
+        <ul>
+            <li>Always keep your API Key secret.</li>
+            <li>The QR code and secret should be given to the user only once (during setup).</li>
+            <li>OTPs are time-based and valid for 30 seconds (with a ±30s window).</li>
+            <li>If you lose your API Key, generate a new one from your dashboard.</li>
+        </ul>
+    </div>
+
+    <p>For further help, contact support or refer to the dashboard for your API Key and endpoint URL.</p>
+    <div style="margin-top: 48px; text-align: center;">
+        <a href="https://coff.ee/dbaidya811e" target="_blank" class="coffee-btn">☕ Buy Me a Coffee</a>
+    </div>
+
+</div>
+</body>
+</html> 

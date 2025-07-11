@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2FA QR Setup</title>
+    <style>
+        body { background: #f8f9fa; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        .container {
+            max-width: 340px;
+            margin: 48px auto;
+            background: #fff;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px #0001;
+            padding: 24px 20px 18px 20px;
+            text-align: center;
+        }
+        h2 { margin-top: 0; font-size: 1.2em; }
+        img { max-width: 220px; width: 100%; margin-bottom: 18px; }
+        code { background: #f4f4f4; padding: 6px 10px; border-radius: 4px; font-size: 1em; display: inline-block; margin-bottom: 10px; }
+        p { margin-bottom: 10px; }
+        @media (max-width: 500px) {
+            .container { max-width: 98vw; margin: 18vw 1vw; padding: 16px 6vw; }
+            img { max-width: 90vw; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Scan this QR Code</h2>
+        <img src="data:image/png;base64,{{ qr_b64 }}" alt="QR Code">
+        <p>Or enter this secret manually:</p>
+        <code>{{ secret }}</code>
+        <p>Use Google Authenticator or any compatible app.</p>
+    </div>
+</body>
+</html> 
